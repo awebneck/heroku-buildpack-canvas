@@ -637,6 +637,12 @@ rescue URI::InvalidURIError
   raise "Invalid DATABASE_URL"
 end
 
+begin
+  queue_uri = URI.parse(ENV["QUEUE_DATABASE_URL"])
+rescue URI::InvalidURIError
+  raise "Invalid QUEUE_DATABASE_URL"
+end
+
 raise "No RACK_ENV or RAILS_ENV found" unless ENV["RAILS_ENV"] || ENV["RACK_ENV"]
 
 def attribute(name, value, force_string = false)
@@ -666,6 +672,15 @@ port = uri.port
 
 params = CGI.parse(uri.query || "")
 
+queue_adapter = queue_uri.scheme
+queue_adapter = "postgresql" if queue_adapter == "postgres"
+queue_database = (queue_uri.path || "").split("/")[1]
+queue_username = queue_uri.user
+queue_password = queue_uri.password
+queue_host = queue_uri.host
+queue_port = queue_uri.port
+queue_params = CGI.parse(queue_uri.query || "")
+
 %>
 
 <%= ENV["RAILS_ENV"] || ENV["RACK_ENV"] %>:
@@ -679,6 +694,17 @@ params = CGI.parse(uri.query || "")
 <% params.each do |key, value| %>
   <%= key %>: <%= value.first %>
 <% end %>
+  queue:
+    <%= attribute "adapter",  queue_adapter %>
+    <%= attribute "database", queue_database %>
+    <%= attribute "username", queue_username %>
+    <%= attribute "password", queue_password, true %>
+    <%= attribute "host",     queue_host %>
+    <%= attribute "port",     queue_port %>
+
+  <% queue_params.each do |key, value| %>
+    <%= key %>: <%= value.first %>
+  <% end %>
         DATABASE_YML
         end
       end
