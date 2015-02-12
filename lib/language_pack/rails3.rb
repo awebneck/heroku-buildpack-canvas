@@ -64,7 +64,7 @@ private
           return true
         end
 
-        precompile = rake.task("assets:precompile")
+        precompile = rake.task("canvas:compile_assets")
         return true unless precompile.is_defined?
 
         topic("Preparing app for Rails asset pipeline")
