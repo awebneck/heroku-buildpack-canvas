@@ -623,7 +623,7 @@ ERROR
     instrument 'ruby.create_database_yml' do
       log("create_database_yml") do
         return unless File.directory?("config")
-        topic("Writing config/database.yml to read from DATABASE_URL")
+        topic("Writing config/database.yml to read from MAIN_DATABASE_URL")
         File.open("config/database.yml", "w") do |file|
           file.puts <<-DATABASE_YML
 <%
@@ -632,9 +632,9 @@ require 'cgi'
 require 'uri'
 
 begin
-  uri = URI.parse(ENV["DATABASE_URL"])
+  uri = URI.parse(ENV["MAIN_DATABASE_URL"])
 rescue URI::InvalidURIError
-  raise "Invalid DATABASE_URL"
+  raise "Invalid MAIN_DATABASE_URL"
 end
 
 begin
